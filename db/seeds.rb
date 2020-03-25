@@ -1,7 +1,86 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
-#   Character.create(name: 'Luke', movie: movies.first)
+events = [
+  [50, 'SCY', 'freestyle', false],
+  [100, 'SCY', 'freestyle', false],
+  [200, 'SCY', 'freestyle', false],
+  [500, 'SCY', 'freestyle', false],
+  [1000, 'SCY', 'freestyle', false],
+  [1650, 'SCY', 'freestyle', false],
+  [50, 'SCY', 'butterfly', false],
+  [100, 'SCY', 'butterfly', false],
+  [200, 'SCY', 'butterfly', false],
+  [50, 'SCY', 'backstroke', false],
+  [100, 'SCY', 'backstroke', false],
+  [200, 'SCY', 'backstroke', false],
+  [50, 'SCY', 'breaststroke', false],
+  [100, 'SCY', 'breaststroke', false],
+  [200, 'SCY', 'breaststroke', false],
+  [100, 'SCY', 'medley', false],
+  [200, 'SCY', 'medley', false],
+  [400, 'SCY', 'medley', false],
+  [200, 'SCY', 'freestyle', true],
+  [400, 'SCY', 'freestyle', true],
+  [800, 'SCY', 'freestyle', true],
+  [200, 'SCY', 'medley', true],
+  [400, 'SCY', 'medley', true],
+
+  [50, 'LCM', 'freestyle', false],
+  [100, 'LCM', 'freestyle', false],
+  [200, 'LCM', 'freestyle', false],
+  [400, 'LCM', 'freestyle', false],
+  [800, 'LCM', 'freestyle', false],
+  [1500, 'LCM', 'freestyle', false],
+  [50, 'LCM', 'butterfly', false],
+  [100, 'LCM', 'butterfly', false],
+  [200, 'LCM', 'butterfly', false],
+  [50, 'LCM', 'backstroke', false],
+  [100, 'LCM', 'backstroke', false],
+  [200, 'LCM', 'backstroke', false],
+  [50, 'LCM', 'breaststroke', false],
+  [100, 'LCM', 'breaststroke', false],
+  [200, 'LCM', 'breaststroke', false],
+  [200, 'LCM', 'medley', false],
+  [400, 'LCM', 'medley', false],
+  [200, 'LCM', 'freestyle', true],
+  [400, 'LCM', 'freestyle', true],
+  [800, 'LCM', 'freestyle', true],
+  [200, 'LCM', 'medley', true],
+  [400, 'LCM', 'medley', true],
+  
+  [50, 'SCM', 'freestyle', false],
+  [100, 'SCM', 'freestyle', false],
+  [200, 'SCM', 'freestyle', false],
+  [400, 'SCM', 'freestyle', false],
+  [800, 'SCM', 'freestyle', false],
+  [1500, 'SCM', 'freestyle', false],
+  [50, 'SCM', 'butterfly', false],
+  [100, 'SCM', 'butterfly', false],
+  [200, 'SCM', 'butterfly', false],
+  [50, 'SCM', 'backstroke', false],
+  [100, 'SCM', 'backstroke', false],
+  [200, 'SCM', 'backstroke', false],
+  [50, 'SCM', 'breaststroke', false],
+  [100, 'SCM', 'breaststroke', false],
+  [200, 'SCM', 'breaststroke', false],
+  [100, 'SCM', 'medley', false],
+  [200, 'SCM', 'medley', false],
+  [400, 'SCM', 'medley', false],
+  [200, 'SCM', 'freestyle', true],
+  [400, 'SCM', 'freestyle', true],
+  [800, 'SCM', 'freestyle', true],
+  [200, 'SCM', 'medley', true],
+  [400, 'SCM', 'medley', true],
+]
+
+events.each do |event|
+  distance = event[0]
+  course = event[1]
+  stroke = event[2]
+  relay = event[3]
+
+  Event.find_or_create_by(
+    distance: distance,
+    course: course,
+    stroke: stroke,
+    relay: relay
+  )
+end

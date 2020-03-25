@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_24_042016) do
+ActiveRecord::Schema.define(version: 2020_03_25_020932) do
+
+  create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "distance", limit: 2, null: false
+    t.string "course", null: false
+    t.string "stroke", null: false
+    t.boolean "relay", default: false, null: false
+    t.index ["distance", "course", "stroke", "relay"], name: "index_events_on_distance_and_course_and_stroke_and_relay", unique: true
+  end
 
   create_table "meets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "usms_meet_id", null: false
