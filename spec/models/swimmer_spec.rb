@@ -7,20 +7,28 @@ RSpec.describe Swimmer, type: :model do
     expect(swimmer.valid?).to be true
   end
 
-  it 'creates properly' do
+  it 'creates successfully' do
     swimmer.save!
   end
 
   describe 'validations' do
-    describe '#permanent_id' do
+    describe '#usms_permanent_id' do
       it 'disallows nil' do
-        swimmer.permanent_id = nil
+        swimmer.usms_permanent_id = nil
         expect(swimmer.valid?).to be false
       end
 
       it 'disallows empty string' do
-        swimmer.permanent_id = ''
+        swimmer.usms_permanent_id = ''
         expect(swimmer.valid?).to be false
+      end
+
+      it 'disallows duplicates' do
+        swimmer.save!
+        swimmer2 = build(:swimmer)
+        expect(swimmer2.valid?).to be true
+        swimmer2.usms_permanent_id = swimmer.usms_permanent_id
+        expect(swimmer2.valid?).to be false
       end
     end
 
