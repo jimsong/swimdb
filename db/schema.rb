@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_25_020932) do
+ActiveRecord::Schema.define(version: 2020_03_25_024626) do
+
+  create_table "age_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "gender", limit: 1, null: false
+    t.integer "start_age", limit: 2, null: false
+    t.integer "end_age", limit: 2
+    t.boolean "relay", default: false, null: false
+    t.index ["gender", "start_age", "relay"], name: "index_age_groups_on_gender_and_start_age_and_relay", unique: true
+  end
 
   create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "distance", limit: 2, null: false
