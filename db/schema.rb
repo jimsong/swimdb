@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_25_024626) do
+ActiveRecord::Schema.define(version: 2020_03_28_212418) do
 
   create_table "age_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "gender", limit: 1, null: false
@@ -33,6 +33,21 @@ ActiveRecord::Schema.define(version: 2020_03_25_024626) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["usms_meet_id"], name: "index_meets_on_usms_meet_id", unique: true
+  end
+
+  create_table "results", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "meet_id", null: false
+    t.bigint "event_id", null: false
+    t.bigint "age_group_id", null: false
+    t.bigint "swimmer_id", null: false
+    t.integer "time_ms", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["age_group_id"], name: "index_results_on_age_group_id"
+    t.index ["event_id"], name: "index_results_on_event_id"
+    t.index ["meet_id"], name: "index_results_on_meet_id"
+    t.index ["swimmer_id"], name: "index_results_on_swimmer_id"
+    t.index ["time_ms"], name: "index_results_on_time_ms"
   end
 
   create_table "swimmers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
