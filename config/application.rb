@@ -34,6 +34,7 @@ module Swimdb
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
+    config.colorize_logging = false
     config.hosts << "host.docker.internal"
   end
 end

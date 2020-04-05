@@ -2,6 +2,7 @@ class CreateMeets < ActiveRecord::Migration[6.0]
   def change
     create_table :meets do |t|
       t.string :usms_meet_id, null: false
+      t.string :name
 
       t.timestamps
 
