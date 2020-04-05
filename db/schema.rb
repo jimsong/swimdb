@@ -54,8 +54,8 @@ ActiveRecord::Schema.define(version: 2020_03_28_212418) do
     t.string "usms_permanent_id", null: false
     t.string "first_name"
     t.string "last_name"
-    t.string "gender", limit: 1, null: false
-    t.date "birth_date", null: false
+    t.string "gender", limit: 1
+    t.date "birth_date"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["usms_permanent_id"], name: "index_swimmers_on_usms_permanent_id", unique: true

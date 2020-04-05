@@ -10,7 +10,6 @@ gem 'rails', '~> 6.0.2', '>= 6.0.2.1'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
-gem 'slack-ruby-client', '~> 0.14.5'
 
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3', '~> 1.4'
@@ -27,6 +26,10 @@ gem 'slack-ruby-client', '~> 0.14.5'
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
+
+gem 'nokogiri', '~>1.10'
+gem 'rest-client', '~>2.1'
+gem 'slack-ruby-client', '~> 0.14.5'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

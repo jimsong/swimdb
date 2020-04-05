@@ -33,6 +33,12 @@ RSpec.describe Swimmer, type: :model do
     end
 
     describe '#gender' do
+      it 'allows nil' do
+        swimmer.gender = nil
+        expect(swimmer.valid?).to be true
+        swimmer.save!
+      end
+
       it 'allows "M"' do
         swimmer.gender = 'M'
         expect(swimmer.valid?).to be true
@@ -50,9 +56,10 @@ RSpec.describe Swimmer, type: :model do
     end
 
     describe '#birth_date' do
-      it 'disallows nil' do
+      it 'allows nil' do
         swimmer.birth_date = nil
-        expect(swimmer.valid?).to be false
+        expect(swimmer.valid?).to be true
+        swimmer.save!
       end
     end
   end

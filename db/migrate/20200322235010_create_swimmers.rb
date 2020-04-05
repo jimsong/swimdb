@@ -4,8 +4,8 @@ class CreateSwimmers < ActiveRecord::Migration[6.0]
       t.string :usms_permanent_id, null: false
       t.string :first_name
       t.string :last_name
-      t.string :gender, limit: 1, null: false
-      t.date :birth_date, null: false
+      t.string :gender, limit: 1
+      t.date :birth_date
 
       t.timestamps
 
