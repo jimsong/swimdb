@@ -27,6 +27,26 @@ module UsmsService
     swimmer
   end
 
+  def self.fetch_meet(usms_meet_id)
+    Rails.logger.info("Fetching meet with ID #{usms_meet_id}")
+    url = File.join(BASE_URL, '/comp/meets/meet.php')
+    params = { MeetID: usms_meet_id }
+    response = RestClient.get(url, params: params)
+
+    page = Nokogiri::HTML(response)
+    name = page.css('div.contenttext h3')[0].text
+    year = usms_meet_id[0, 4].to_i
+    Rails.logger.info("Found new meet \"#{name}\" with ID #{usms_meet_id}")
+
+    meet = Meet.find_or_initialize_by(
+        usms_meet_id: usms_meet_id,
+        year: year
+    )
+    meet.update(name: name)
+
+    meet
+  end
+
   def self.fetch_swimmers_by_name(first_name, last_name, year)
     swimmer = Swimmer.find_by(first_name: first_name, last_name: last_name)
     if swimmer.nil?
@@ -144,6 +164,31 @@ module UsmsService
     end
 
     swimmers
+  end
+
+  def self.get_swimmer_meet_ids(usms_permanent_id)
+    usms_meet_ids = Set.new
+
+    url = File.join(BASE_URL, '/comp/meets/indresults.php')
+    params = { SwimmerID: usms_permanent_id }
+    response = RestClient.get(url, params: params)
+
+    page = Nokogiri::HTML(response)
+    rows = page.css('table.indresults tr')
+    nbsp = 160.chr(Encoding::UTF_8)
+
+    rows.each do |row|
+      tds = row.css('td')
+      if tds.count == 8
+        club = tds[3].text.gsub(nbsp, ' ').strip
+        if club == 'MEMO'
+          usms_meet_id = tds[1].css('a').text
+          usms_meet_ids.add(usms_meet_id)
+        end
+      end
+    end
+
+    return usms_meet_ids.to_a
   end
 
 end
