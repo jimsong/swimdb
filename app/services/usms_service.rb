@@ -1,17 +1,30 @@
 module UsmsService
   BASE_URL = 'https://usms.org'
 
-  def self.get_swimmer_info(usms_permanent_id)
+  def self.fetch_swimmer(usms_permanent_id)
+    Rails.logger.info("Fetching swimmer with permanent ID #{usms_permanent_id}")
     url = File.join(BASE_URL, '/people', usms_permanent_id)
     response = RestClient.get(url)
+
     page = Nokogiri::HTML(response)
     name = page.css('div.contenttext div table tr')[1].css("td")[1].text
     name_parts = name.strip.split(/\s+/)
-    Swimmer.new(
-      usms_permanent_id: usms_permanent_id,
-      first_name: name_parts[0],
-      last_name: name_parts[-1]
+    middle_initial = name_parts[1..-2].find { |part| part.length == 1 }
+    name_parts.reject! { |part| part.length < 2 }
+    first_name = name_parts[0]
+    last_name = name_parts[1..-1].join(' ')
+    Rails.logger.info("Found new swimmer #{first_name} #{last_name} with permanent ID #{usms_permanent_id}")
+
+    swimmer = Swimmer.find_or_initialize_by(
+      usms_permanent_id: usms_permanent_id
     )
+    swimmer.update(
+      first_name: first_name,
+      middle_initial: middle_initial,
+      last_name: last_name
+    )
+
+    swimmer
   end
 
   def self.fetch_swimmers_by_name(first_name, last_name, year)
@@ -107,6 +120,7 @@ module UsmsService
 
     page = Nokogiri::HTML(response)
     links = page.css('div.contenttext ul li a')
+
     links.map do |link|
       link['href'] =~ /MeetID=(.*)/
       usms_meet_id = $1
@@ -122,7 +136,11 @@ module UsmsService
     swimmers = []
 
     Meet.where(year: year).each do |meet|
-      swimmers.concat fetch_swimmers_from_meet(meet.usms_meet_id)
+      begin
+        swimmers.concat fetch_swimmers_from_meet(meet.usms_meet_id)
+      rescue => e
+        Rails.logger.error("ERROR: Failed to fetch swimmers from meet #{meet.usms_meet_id}\n#{e.message}\n#{e.backtrace.join("\n")}")
+      end
     end
 
     swimmers
