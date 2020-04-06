@@ -26,7 +26,7 @@ class Swimmer < ApplicationRecord
         meet = UsmsService.fetch_meet(usms_meet_id)
         meets.reload
       end
-      if meet && !meets.include?(meet)
+      if meet && !meet_ids.include?(meet.id)
         meets.append(meet)
         save!
       end
