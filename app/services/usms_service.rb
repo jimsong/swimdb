@@ -40,9 +40,8 @@ module UsmsService
 
     meet = Meet.find_or_initialize_by(
         usms_meet_id: usms_meet_id,
-        year: year
     )
-    meet.update(name: name)
+    meet.update(name: name, year: year)
 
     meet
   end

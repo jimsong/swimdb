@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Swimmer, type: :model do
-  let(:swimmer) { build(:swimmer)  }
+  let(:swimmer) { build(:swimmer) }
 
   it 'builds properly' do
     expect(swimmer.valid?).to be true
@@ -61,6 +61,62 @@ RSpec.describe Swimmer, type: :model do
         swimmer.birth_date = nil
         expect(swimmer.valid?).to be true
         swimmer.save!
+      end
+    end
+  end
+
+  describe 'after_save' do
+    let(:swimmer) do
+      build(:swimmer, first_name: 'Ryan', last_name: 'Lochte')
+    end
+
+    before do
+      swimmer.save!
+    end
+
+    context 'on creation' do
+      it 'creates a new SwimmerAlias' do
+        swimmer_alias = SwimmerAlias.find_by(
+          first_name: 'Ryan',
+          last_name: 'Lochte'
+        )
+        expect(swimmer_alias).to_not be_nil
+      end
+    end
+
+    context 'with a SwimmerAlias of a different name' do
+      before do
+        swimmer.first_name = 'Michael'
+        swimmer.last_name = 'Phelps'
+        swimmer.save!
+      end
+
+      it 'keeps the existing SwimmerAlias' do
+        swimmer_alias = SwimmerAlias.find_by(
+          first_name: 'Ryan',
+          last_name: 'Lochte'
+        )
+        expect(swimmer_alias).to_not be_nil
+      end
+
+      it 'creates a new SwimmerAlias' do
+        swimmer_alias = SwimmerAlias.find_by(
+          first_name: 'Michael',
+          last_name: 'Phelps'
+        )
+        expect(swimmer_alias).to_not be_nil
+      end
+    end
+
+    context 'with a SwimmerAlias of the same name' do
+      it 'does not create a new SwimmerAlias' do
+        swimmer.usms_permanent_id = 'changed'
+        swimmer.save!
+        count = SwimmerAlias.where(
+          first_name: 'Ryan',
+          last_name: 'Lochte'
+        ).count
+        expect(count).to eq 1
       end
     end
   end
