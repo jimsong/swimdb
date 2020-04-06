@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_28_212418) do
+ActiveRecord::Schema.define(version: 2020_04_06_004535) do
 
   create_table "age_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "gender", limit: 1, null: false
@@ -51,6 +51,16 @@ ActiveRecord::Schema.define(version: 2020_03_28_212418) do
     t.index ["meet_id"], name: "index_results_on_meet_id"
     t.index ["swimmer_id"], name: "index_results_on_swimmer_id"
     t.index ["time_ms"], name: "index_results_on_time_ms"
+  end
+
+  create_table "swimmer_aliases", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "first_name"
+    t.string "last_name"
+    t.bigint "swimmer_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["last_name", "first_name"], name: "index_swimmer_aliases_on_last_name_and_first_name", unique: true
+    t.index ["swimmer_id"], name: "index_swimmer_aliases_on_swimmer_id"
   end
 
   create_table "swimmers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|

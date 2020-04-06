@@ -29,6 +29,7 @@ RSpec.describe Meet, type: :model do
         expect(meet2.valid?).to be true
         meet2.usms_meet_id = meet.usms_meet_id
         expect(meet2.valid?).to be false
+        expect(meet2.save).to be false
       end
     end
   end

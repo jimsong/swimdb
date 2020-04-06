@@ -16,9 +16,15 @@ module UsmsService
 
   def self.fetch_swimmers_by_name(first_name, last_name, year)
     swimmer = Swimmer.find_by(first_name: first_name, last_name: last_name)
+    if swimmer.nil?
+      swimmer_alias = SwimmerAlias.find_by(first_name: first_name, last_name: last_name)
+      if swimmer_alias
+        swimmer = swimmer_alias.swimmer
+      end
+    end
     if swimmer
       Rails.logger.info("Found existing swimmer #{first_name} #{last_name} with permanent ID #{swimmer.usms_permanent_id}")
-      return swimmer
+      return [swimmer]
     end
 
     url = File.join(BASE_URL, '/reg/members/jqs/searchmembers.php')
@@ -31,7 +37,7 @@ module UsmsService
     response = RestClient.get(url, params: params)
 
     json_body = JSON.parse(response.body)
-    json_body['rows'].map do |row|
+    swimmers = json_body['rows'].map do |row|
       next if row['ClubAbbr'] != 'MEMO'
       usms_permanent_id = row['RegNumber'].split('-')[1]
       Rails.logger.info("Found new swimmer #{first_name} #{last_name} with permanent ID #{usms_permanent_id}")
@@ -45,6 +51,11 @@ module UsmsService
       )
       swimmer
     end.compact
+
+    if swimmers.empty?
+      raise StandardError.new('No matching swimmers found')
+    end
+    swimmers
   end
 
   def self.get_meet_swimmer_names(usms_meet_id)
@@ -59,9 +70,9 @@ module UsmsService
     matches.map do |match|
       match[0].strip
     end.uniq.map do |last_name_first|
-      names = last_name_first.split(/[, ]+/)
+      names = last_name_first.split(',')
       {
-        first_name: names[1],
+        first_name: names[1].split(' ')[0],
         last_name: names[0]
       }
     end
@@ -82,6 +93,7 @@ module UsmsService
         swimmers.concat fetch_swimmers_by_name(first_name, last_name, year)
       rescue => e
         Rails.logger.error("ERROR: Failed to fetch swimmer #{first_name} #{last_name}\n#{e.message}\n#{e.backtrace.join("\n")}")
+        SwimmerAlias.find_or_create_by(first_name: first_name, last_name: last_name)
       end
     end
 
@@ -104,6 +116,16 @@ module UsmsService
       meet.update(name: name, year: year)
       meet
     end
+  end
+
+  def self.fetch_swimmers_from_year(year)
+    swimmers = []
+
+    Meet.where(year: year).each do |meet|
+      swimmers.concat fetch_swimmers_from_meet(meet.usms_meet_id)
+    end
+
+    swimmers
   end
 
 end

@@ -29,6 +29,7 @@ RSpec.describe Swimmer, type: :model do
         expect(swimmer2.valid?).to be true
         swimmer2.usms_permanent_id = swimmer.usms_permanent_id
         expect(swimmer2.valid?).to be false
+        expect(swimmer2.save).to be false
       end
     end
 
