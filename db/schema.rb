@@ -31,9 +31,11 @@ ActiveRecord::Schema.define(version: 2020_03_28_212418) do
   create_table "meets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "usms_meet_id", null: false
     t.string "name"
+    t.integer "year", limit: 2
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["usms_meet_id"], name: "index_meets_on_usms_meet_id", unique: true
+    t.index ["year"], name: "index_meets_on_year"
   end
 
   create_table "results", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
