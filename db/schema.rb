@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_06_004535) do
+ActiveRecord::Schema.define(version: 2020_04_06_132858) do
 
   create_table "age_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "gender", limit: 1, null: false
@@ -36,6 +36,13 @@ ActiveRecord::Schema.define(version: 2020_04_06_004535) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["usms_meet_id"], name: "index_meets_on_usms_meet_id", unique: true
     t.index ["year"], name: "index_meets_on_year"
+  end
+
+  create_table "meets_swimmers", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "swimmer_id"
+    t.bigint "meet_id"
+    t.index ["meet_id"], name: "index_meets_swimmers_on_meet_id"
+    t.index ["swimmer_id"], name: "index_meets_swimmers_on_swimmer_id"
   end
 
   create_table "results", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|

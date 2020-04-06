@@ -81,6 +81,7 @@ module UsmsService
         middle_initial: row['MI'],
         last_name: row['LastName']
       )
+      swimmer.reconcile_meets
       swimmer
     end.compact
 
