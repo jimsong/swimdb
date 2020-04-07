@@ -1,9 +1,9 @@
 class Swimmer < ApplicationRecord
-  has_many :swimmer_aliases, dependent: :delete_all
+  has_many :swimmer_aliases
   has_and_belongs_to_many :meets
 
   validates :usms_permanent_id, presence: true, uniqueness: { case_sensitive: false }
-  validates :gender, inclusion: { in: %w(M F), allow_nil: true }
+  validates :gender, inclusion: { in: %w(M W), allow_nil: true }
 
   after_save :create_swimmer_alias
 

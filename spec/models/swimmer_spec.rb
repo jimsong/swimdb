@@ -45,13 +45,13 @@ RSpec.describe Swimmer, type: :model do
         expect(swimmer.valid?).to be true
       end
 
-      it 'allows "F"' do
-        swimmer.gender = 'F'
+      it 'allows "W"' do
+        swimmer.gender = 'W'
         expect(swimmer.valid?).to be true
       end
 
       it 'disallows invalid value' do
-        swimmer.gender = 'f'
+        swimmer.gender = 'w'
         expect(swimmer.valid?).to be false
       end
     end
