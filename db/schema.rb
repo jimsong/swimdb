@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_06_132858) do
+ActiveRecord::Schema.define(version: 2020_04_07_012222) do
 
   create_table "age_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "gender", limit: 1, null: false
@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(version: 2020_04_06_132858) do
   create_table "meets_swimmers", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "swimmer_id"
     t.bigint "meet_id"
+    t.index ["meet_id", "swimmer_id"], name: "index_meets_swimmers_on_meet_id_and_swimmer_id", unique: true
     t.index ["meet_id"], name: "index_meets_swimmers_on_meet_id"
     t.index ["swimmer_id"], name: "index_meets_swimmers_on_swimmer_id"
   end
@@ -82,4 +83,11 @@ ActiveRecord::Schema.define(version: 2020_04_06_132858) do
     t.index ["usms_permanent_id"], name: "index_swimmers_on_usms_permanent_id", unique: true
   end
 
+  add_foreign_key "meets_swimmers", "meets"
+  add_foreign_key "meets_swimmers", "swimmers", on_delete: :cascade
+  add_foreign_key "results", "age_groups"
+  add_foreign_key "results", "events"
+  add_foreign_key "results", "meets"
+  add_foreign_key "results", "swimmers"
+  add_foreign_key "swimmer_aliases", "swimmers", on_delete: :cascade
 end

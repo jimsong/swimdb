@@ -81,7 +81,6 @@ module UsmsService
         middle_initial: row['MI'],
         last_name: row['LastName']
       )
-      swimmer.reconcile_meets
       swimmer
     end.compact
 
@@ -113,6 +112,7 @@ module UsmsService
 
   def self.fetch_swimmers_from_meet(usms_meet_id)
     swimmers = []
+    meet = Meet.find_by(usms_meet_id: usms_meet_id)
 
     Rails.logger.info("Fetching swimmers from meet #{usms_meet_id}")
     year = usms_meet_id[0, 4].to_i
@@ -127,6 +127,13 @@ module UsmsService
       rescue => e
         Rails.logger.error("ERROR: Failed to fetch swimmer #{first_name} #{last_name}\n#{e.message}\n#{e.backtrace.join("\n")}")
         SwimmerAlias.find_or_create_by(first_name: first_name, last_name: last_name)
+      end
+    end
+
+    swimmers.each do |swimmer|
+      if meet && !swimmer.meet_ids.include?(meet.id)
+        swimmer.meets.append(meet)
+        swimmer.save!
       end
     end
 
