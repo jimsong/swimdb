@@ -78,9 +78,9 @@ module UsmsService
         usms_permanent_id: usms_permanent_id
       )
       swimmer.update(
-        first_name: row['FirstName'],
-        middle_initial: row['MI'],
-        last_name: row['LastName']
+        first_name: row['FirstName']&.strip,
+        middle_initial: row['MI']&.strip,
+        last_name: row['LastName']&.strip
       )
       swimmer
     end.compact
