@@ -214,4 +214,76 @@ module UsmsService
     return usms_meet_ids.to_a
   end
 
+  def self.fetch_swimmer_results(usms_permanent_id)
+    Rails.logger.info("Fetching results for swimmer with permanent ID #{usms_permanent_id}")
+    swimmer = Swimmer.find_by!(usms_permanent_id: usms_permanent_id)
+    results = []
+
+    url = File.join(BASE_URL, '/comp/meets/indresults.php')
+    params = { SwimmerID: usms_permanent_id }
+    response = RestClient.get(url, params: params)
+
+    page = Nokogiri::HTML(response)
+    tables = page.css('table.indresults')
+    course = nil
+    start_age = nil
+
+    tables.each do |table|
+      rows = table.css('tr')
+      rows.each do |row|
+        ths = row.css('th')
+        if ths.count == 1 && ths[0]['colspan'] == '8'
+          ths[0].text.gsub(NBSP, ' ').strip =~ /(.{3}) Results for (.*)-.* Age Group/
+          course = $1
+          start_age = $2.to_i
+        end
+
+        tds = row.css('td')
+        if tds.count == 8
+          club = tds[3].text.gsub(NBSP, ' ').strip
+          if club == 'MEMO'
+            date = Date.parse(tds[1].text.gsub(NBSP, ' ').strip[0, 10])
+            usms_meet_id = tds[1].css('a').text
+            meet = Meet.find_by!(usms_meet_id: usms_meet_id)
+            event_name = tds[4].text.gsub(NBSP, ' ').strip
+            event = Event.find_by_course_and_name(course, event_name)
+            time_text = tds[6].text.gsub(NBSP, ' ').strip
+            time_text =~ /((\d*):)?(\d+)\.(\d+)/
+            time_ms = time_to_ms(time_text)
+            age_group = AgeGroup.find_by!(gender: swimmer.gender, start_age: start_age)
+            result = swimmer.results.find_or_initialize_by(meet: meet, event: event, age_group: age_group)
+            begin
+              result.update!(time_ms: [time_ms, result.time_ms].compact.min, date: date)
+              results << result
+            rescue => e
+              Rails.logger.error("Failed to fetch result for meet #{usms_meet_id} event #{event.id}: #{e}")
+            end
+          end
+        end
+      end
+    end
+    results.count
+  end
+
+  def self.time_to_ms(time_text)
+    time_text =~ /((\d*):)?(\d+)\.(\d+)/
+    minutes = $2.to_i
+    seconds = $3.to_i
+    centis = $4.to_i
+    minutes * 60000 + seconds * 1000 + centis * 10
+  end
+
+  def self.ms_to_time(time_ms)
+    minutes = time_ms / 60000
+    remain = time_ms % 60000
+    seconds = remain / 1000
+    remain = remain % 1000
+    centis = remain / 10
+
+    minutes_text = minutes > 0 ? "#{minutes}:" : ""
+    seconds_text = seconds < 10 ? seconds.to_s.rjust(2, '0') : seconds.to_s
+    centis_text = centis < 10 ? centis.to_s.rjust(2, '0') : centis.to_s
+
+    "#{minutes_text}#{seconds_text}.#{centis_text}"
+  end
 end

@@ -1,3 +1,11 @@
 class AgeGroup < ApplicationRecord
-  GENDERS = %w(M F).freeze
+  has_many :results
+
+  GENDERS = %w(M W).freeze
+
+  def self.find_by_gender_and_text(gender, text)
+    text =~ /^(\d+)-/
+    start_age = $1.to_i
+    AgeGroup.find_by(gender: gender, start_age: start_age)
+  end
 end

@@ -1,11 +1,22 @@
 class Swimmer < ApplicationRecord
-  has_many :swimmer_aliases
   has_and_belongs_to_many :meets
+  has_many :results
+  has_many :swimmer_aliases
 
   validates :usms_permanent_id, presence: true, uniqueness: { case_sensitive: false }
   validates :gender, inclusion: { in: %w(M W), allow_nil: true }
 
   after_save :create_swimmer_alias
+
+  def self.fetch_results
+    all.each do |swimmer|
+      begin
+        UsmsService.fetch_swimmer_results(swimmer.usms_permanent_id)
+      rescue => e
+        Rails.logger.error("ERROR: Failed to fetch results for swimmer with permanent ID #{swimmer.usms_permanent_id}\n#{e.message}\n#{e.backtrace.join("\n")}")
+      end
+    end
+  end
 
   def self.reconcile_meets
     all.each do |swimmer|
@@ -13,7 +24,7 @@ class Swimmer < ApplicationRecord
       begin
         swimmer.reconcile_meets
       rescue => e
-        "ERROR: Failed to reconcile meets for swimmer with permanent ID #{swimmer.usms_permanent_id}\n#{e.message}\n#{e.backtrace.join("\n")}"
+        Rails.logger.error("ERROR: Failed to reconcile meets for swimmer with permanent ID #{swimmer.usms_permanent_id}\n#{e.message}\n#{e.backtrace.join("\n")}")
       end
     end
   end

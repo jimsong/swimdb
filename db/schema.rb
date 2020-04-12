@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_07_012222) do
+ActiveRecord::Schema.define(version: 2020_04_11_030430) do
 
   create_table "age_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "gender", limit: 1, null: false
@@ -52,6 +52,7 @@ ActiveRecord::Schema.define(version: 2020_04_07_012222) do
     t.bigint "age_group_id", null: false
     t.bigint "swimmer_id", null: false
     t.integer "time_ms", null: false
+    t.date "date"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["age_group_id"], name: "index_results_on_age_group_id"
