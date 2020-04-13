@@ -82,6 +82,7 @@ module UsmsService
         middle_initial: row['MI']&.strip,
         last_name: row['LastName']&.strip
       )
+      swimmer.swimmer_aliases.find_or_create_by(first_name: first_name, last_name: last_name)
       swimmer
     end.compact
 
@@ -107,13 +108,13 @@ module UsmsService
         current_gender = 'W'
       elsif line.start_with?('Men')
         current_gender = 'M'
-      elsif line =~ /^.{5}([a-zA-Z, ]*)\d+  MEMO/
+      elsif line =~ /^.{5}(.*)\d+  MEMO/
         full_name = $1.strip
         unless infos.has_key?(full_name)
           name_parts = full_name.split(',')
           infos[full_name] = {
             first_name: name_parts[1].split(' ')[0],
-            last_name: name_parts[0],
+            last_name: name_parts[0].strip,
             gender: current_gender
           }
         end
@@ -144,13 +145,6 @@ module UsmsService
       rescue => e
         Rails.logger.error("ERROR: Failed to fetch swimmer #{first_name} #{last_name}\n#{e.message}\n#{e.backtrace.join("\n")}")
         SwimmerAlias.find_or_create_by(first_name: first_name, last_name: last_name)
-      end
-    end
-
-    swimmers.each do |swimmer|
-      if meet && !swimmer.meet_ids.include?(meet.id)
-        swimmer.meets.append(meet)
-        swimmer.save!
       end
     end
 

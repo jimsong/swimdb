@@ -1,6 +1,6 @@
 class Swimmer < ApplicationRecord
-  has_and_belongs_to_many :meets
   has_many :results
+  has_many :meets, -> { distinct }, through: :results
   has_many :swimmer_aliases
 
   validates :usms_permanent_id, presence: true, uniqueness: { case_sensitive: false }
