@@ -5,6 +5,5 @@ FactoryBot.define do
     middle_initial { ('A'..'Z').to_a.sample }
     sequence(:last_name) { |n| "Last#{n}" }
     gender { %w(M W).sample }
-    birth_date { Date.today }
   end
 end

@@ -55,14 +55,6 @@ RSpec.describe Swimmer, type: :model do
         expect(swimmer.valid?).to be false
       end
     end
-
-    describe '#birth_date' do
-      it 'allows nil' do
-        swimmer.birth_date = nil
-        expect(swimmer.valid?).to be true
-        swimmer.save!
-      end
-    end
   end
 
   describe 'after_save' do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_13_060506) do
+ActiveRecord::Schema.define(version: 2020_04_14_024525) do
 
   create_table "age_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "gender", limit: 1, null: false
@@ -26,6 +26,17 @@ ActiveRecord::Schema.define(version: 2020_04_13_060506) do
     t.string "stroke", null: false
     t.boolean "relay", default: false, null: false
     t.index ["distance", "course", "stroke", "relay"], name: "index_events_on_distance_and_course_and_stroke_and_relay", unique: true
+  end
+
+  create_table "meet_events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "meet_id", null: false
+    t.bigint "event_id", null: false
+    t.integer "event_number", limit: 2
+    t.date "event_date"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["event_id"], name: "index_meet_events_on_event_id"
+    t.index ["meet_id"], name: "index_meet_events_on_meet_id"
   end
 
   create_table "meets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -77,6 +88,8 @@ ActiveRecord::Schema.define(version: 2020_04_13_060506) do
     t.index ["usms_permanent_id"], name: "index_swimmers_on_usms_permanent_id", unique: true
   end
 
+  add_foreign_key "meet_events", "events", on_delete: :cascade
+  add_foreign_key "meet_events", "meets", on_delete: :cascade
   add_foreign_key "results", "age_groups"
   add_foreign_key "results", "events"
   add_foreign_key "results", "meets"
