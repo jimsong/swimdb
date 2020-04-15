@@ -1,6 +1,8 @@
 class Meet < ApplicationRecord
+  has_many :meet_events
+  has_many :events, through: :meet_events
   has_many :results
-  has_many :swimmers, -> { distinct },through: :results
+  has_many :swimmers, -> { distinct }, through: :results
 
   validates :usms_meet_id, presence: true, uniqueness: { case_sensitive: false }
 

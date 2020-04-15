@@ -1,8 +1,10 @@
 class Event < ApplicationRecord
+  has_many :meet_events
+  has_many :meets, through: :meet_events
   has_many :results
 
   COURSES = %w(SCY SCM LCM).freeze
-  STROKES = %w(butterfly backstroke breaststroke freestyle medley).freeze
+  STROKES = %w(Fly Back Breast Free IM).freeze
 
   # e.g. "50 Free"
   def self.find_by_course_and_name(course, event_name)
@@ -10,11 +12,11 @@ class Event < ApplicationRecord
     distance = parts[0].to_i
     stroke =
         case parts[1].downcase
-        when /^(butter)?fly/ then 'butterfly'
-        when /^back/ then 'backstroke'
-        when /^breast/ then 'breaststroke'
-        when /^free/ then 'freestyle'
-        when /^i|m/ then 'medley'
+        when /^(butter)?fly/ then 'Fly'
+        when /^back/ then 'Back'
+        when /^breast/ then 'Breast'
+        when /^free/ then 'Free'
+        when /^i|m/ then 'IM'
         else nil
         end
 
