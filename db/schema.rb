@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_14_030319) do
+ActiveRecord::Schema.define(version: 2020_04_15_025021) do
 
   create_table "age_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "gender", limit: 1, null: false
@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(version: 2020_04_14_030319) do
 
   create_table "meets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "usms_meet_id", null: false
+    t.string "club_assistant_meet_id"
     t.string "name"
     t.integer "year", limit: 2
     t.date "start_date"

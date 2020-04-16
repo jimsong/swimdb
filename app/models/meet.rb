@@ -6,6 +6,10 @@ class Meet < ApplicationRecord
 
   validates :usms_meet_id, presence: true, uniqueness: { case_sensitive: false }
 
+  def url
+    "https://usms.org/comp/meets/meet.php?MeetID=#{usms_meet_id}"
+  end
+
   def self.prune
     all.each do |meet|
       if meet.swimmers.count == 0

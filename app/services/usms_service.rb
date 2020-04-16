@@ -33,16 +33,53 @@ module UsmsService
     url = File.join(BASE_URL, '/comp/meets/meet.php')
     params = { MeetID: usms_meet_id }
     response = RestClient.get(url, params: params)
-
     page = Nokogiri::HTML(response)
+
     name = page.css('div.contenttext h3')[0].text
-    year = usms_meet_id[0, 4].to_i
-    Rails.logger.info("Found new meet \"#{name}\" with ID #{usms_meet_id}")
+
+    links = page.css('div.contenttext table a')
+    club_assistant_meet_id = links.detect do |link|
+      if link['href'] =~ /smid=(\d+)/
+        break $1
+      end
+    end
+
+    date_text = page.css('div.contenttext table tr')[1].css('td').text
+    if date_text =~ /\A(\w+) (\d+), (\d+)\z/
+      start_month = end_month = $1
+      start_day = end_day = $2
+      year = $3
+    elsif date_text =~ /\A(\w+) (\d+)-(\d+), (\d+)\z/
+      start_month = end_month = $1
+      start_day = $2
+      end_day = $3
+      year = $4
+    elsif date_text =~ /\A(\w+) (\d+) - (\w+) (\d+), (\d+)\z/
+      start_month = $1
+      start_day = $2
+      end_month = $3
+      end_day = $4
+      year = $5
+    else
+      Rails.logger.error("ERROR: Failed to fetch meet dates for meet with ID #{usms_meet_id}")
+      return
+    end
+
+    start_date = Date.parse("#{start_month} #{start_day}, #{year}")
+    end_date = Date.parse("#{end_month} #{end_day}, #{year}")
+
+    Rails.logger.info("Found meet \"#{name}\" with ID #{usms_meet_id}")
 
     meet = Meet.find_or_initialize_by(
         usms_meet_id: usms_meet_id,
     )
-    meet.update(name: name, year: year)
+    meet.update(
+      name: name,
+      year: start_date.year,
+      start_date: start_date,
+      end_date: end_date,
+      club_assistant_meet_id: club_assistant_meet_id
+    )
 
     meet
   end
@@ -247,7 +284,10 @@ module UsmsService
             age_group = AgeGroup.find_by!(gender: swimmer.gender, start_age: start_age)
             result = swimmer.results.find_or_initialize_by(meet: meet, event: event, age_group: age_group)
             begin
-              result.update!(time_ms: [time_ms, result.time_ms].compact.min, date: date)
+              result.update!(
+                time_ms: [time_ms, result.time_ms].compact.min,
+                date: result.date || date
+              )
               results << result
             rescue => e
               Rails.logger.error("Failed to fetch result for meet #{usms_meet_id} event #{event.id}: #{e}")
