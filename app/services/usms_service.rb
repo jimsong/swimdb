@@ -44,7 +44,9 @@ module UsmsService
       end
     end
 
-    date_text = page.css('div.contenttext table tr')[1].css('td').text
+    trs = page.css('div.contenttext table tr')
+    course = trs[0].css('td').text.strip
+    date_text = trs[1].css('td').text.strip
     if date_text =~ /\A(\w+) (\d+), (\d+)\z/
       start_month = end_month = $1
       start_day = end_day = $2
@@ -78,7 +80,8 @@ module UsmsService
       year: start_date.year,
       start_date: start_date,
       end_date: end_date,
-      club_assistant_meet_id: club_assistant_meet_id
+      club_assistant_meet_id: meet.club_assistant_meet_id || club_assistant_meet_id,
+      course: course
     )
 
     meet
