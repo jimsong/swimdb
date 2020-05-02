@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_16_035649) do
+ActiveRecord::Schema.define(version: 2020_05_02_225105) do
 
   create_table "age_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "gender", limit: 1, null: false
@@ -51,6 +51,27 @@ ActiveRecord::Schema.define(version: 2020_04_16_035649) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["usms_meet_id"], name: "index_meets_on_usms_meet_id", unique: true
     t.index ["year"], name: "index_meets_on_year"
+  end
+
+  create_table "relays", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "meet_id", null: false
+    t.bigint "event_id", null: false
+    t.bigint "age_group_id", null: false
+    t.bigint "swimmer1_id", null: false
+    t.bigint "swimmer2_id", null: false
+    t.bigint "swimmer3_id", null: false
+    t.bigint "swimmer4_id", null: false
+    t.integer "time_ms", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["age_group_id"], name: "index_relays_on_age_group_id"
+    t.index ["event_id"], name: "index_relays_on_event_id"
+    t.index ["meet_id"], name: "index_relays_on_meet_id"
+    t.index ["swimmer1_id"], name: "index_relays_on_swimmer1_id"
+    t.index ["swimmer2_id"], name: "index_relays_on_swimmer2_id"
+    t.index ["swimmer3_id"], name: "index_relays_on_swimmer3_id"
+    t.index ["swimmer4_id"], name: "index_relays_on_swimmer4_id"
+    t.index ["time_ms"], name: "index_relays_on_time_ms"
   end
 
   create_table "results", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -94,6 +115,13 @@ ActiveRecord::Schema.define(version: 2020_04_16_035649) do
 
   add_foreign_key "meet_events", "events", on_delete: :cascade
   add_foreign_key "meet_events", "meets", on_delete: :cascade
+  add_foreign_key "relays", "age_groups"
+  add_foreign_key "relays", "events"
+  add_foreign_key "relays", "meets"
+  add_foreign_key "relays", "swimmers", column: "swimmer1_id"
+  add_foreign_key "relays", "swimmers", column: "swimmer2_id"
+  add_foreign_key "relays", "swimmers", column: "swimmer3_id"
+  add_foreign_key "relays", "swimmers", column: "swimmer4_id"
   add_foreign_key "results", "age_groups"
   add_foreign_key "results", "events"
   add_foreign_key "results", "meets"
