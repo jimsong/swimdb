@@ -57,10 +57,11 @@ ActiveRecord::Schema.define(version: 2020_05_02_225105) do
     t.bigint "meet_id", null: false
     t.bigint "event_id", null: false
     t.bigint "age_group_id", null: false
-    t.bigint "swimmer1_id", null: false
-    t.bigint "swimmer2_id", null: false
-    t.bigint "swimmer3_id", null: false
-    t.bigint "swimmer4_id", null: false
+    t.string "name"
+    t.bigint "swimmer1_id"
+    t.bigint "swimmer2_id"
+    t.bigint "swimmer3_id"
+    t.bigint "swimmer4_id"
     t.integer "time_ms", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

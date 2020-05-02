@@ -1,7 +1,8 @@
 namespace :swimdb do
 
-  task import: :environment do
-    UsmsService.fetch_swimmers_from_year(2014)
+  task ad_hoc: :environment do
+    meet = Meet.find(1002)
+    SwimPhoneService.fetch_meet_dates(meet)
   end
 
 end

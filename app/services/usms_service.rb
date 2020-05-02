@@ -87,7 +87,7 @@ module UsmsService
     meet
   end
 
-  def self.fetch_swimmers_by_name(first_name, last_name, year)
+  def self.fetch_swimmers_by_name(first_name, last_name, year, gender = nil)
     swimmer = Swimmer.find_by(first_name: first_name, last_name: last_name)
     if swimmer.nil?
       swimmer_alias = SwimmerAlias.find_by(first_name: first_name, last_name: last_name)
@@ -120,7 +120,8 @@ module UsmsService
       swimmer.update(
         first_name: row['FirstName']&.strip,
         middle_initial: row['MI']&.strip,
-        last_name: row['LastName']&.strip
+        last_name: row['LastName']&.strip,
+        gender: gender
       )
       swimmer.swimmer_aliases.find_or_create_by(first_name: first_name, last_name: last_name)
       swimmer
@@ -130,6 +131,15 @@ module UsmsService
       raise StandardError.new('No matching swimmers found')
     end
     swimmers
+  end
+
+  def self.parse_last_name_comma_first(text)
+    full_name = text.strip
+    name_parts = full_name.split(',')
+    {
+      first_name: name_parts[1].split(' ')[0],
+      last_name: name_parts[0].strip,
+    }
   end
 
   def self.get_meet_swimmer_infos(usms_meet_id)
@@ -151,20 +161,24 @@ module UsmsService
       elsif line =~ /^.{5}(.*)\d+  MEMO/
         full_name = $1.strip
         unless infos.has_key?(full_name)
-          name_parts = full_name.split(',')
-          infos[full_name] = {
-            first_name: name_parts[1].split(' ')[0],
-            last_name: name_parts[0].strip,
-            gender: current_gender
-          }
+          infos[full_name] = parse_last_name_comma_first(full_name).merge(gender: current_gender)
         end
+      end
+    end
+
+    text = page.css('div.contenttext pre')[1].text
+    text.scan(/\d\) (\D+) [MF]\d{2,}/).each do |match|
+      full_name = match[0]
+      unless infos.has_key?(full_name)
+        infos[full_name] = parse_last_name_comma_first(full_name)
       end
     end
 
     infos.values
   end
 
-  def self.fetch_swimmers_from_meet(usms_meet_id)
+  def self.fetch_swimmers_from_meet(meet)
+    usms_meet_id = meet.usms_meet_id
     swimmers = []
     meet = Meet.find_by(usms_meet_id: usms_meet_id)
 
@@ -175,20 +189,105 @@ module UsmsService
     swimmer_names.each do |swimmer_info|
       first_name = swimmer_info[:first_name]
       last_name = swimmer_info[:last_name]
+      gender = swimmer_info[:gender]
       Rails.logger.info("Fetching swimmer #{first_name} #{last_name}")
       begin
-        found_swimmers = fetch_swimmers_by_name(first_name, last_name, year)
-        found_swimmers.each do |swimmer|
-          swimmer.update!(gender: swimmer_info[:gender])
-        end
+        found_swimmers = fetch_swimmers_by_name(first_name, last_name, year, gender)
         swimmers.concat(found_swimmers)
-      rescue => e
-        Rails.logger.error("ERROR: Failed to fetch swimmer #{first_name} #{last_name}\n#{e.message}\n#{e.backtrace.join("\n")}")
+      rescue
+        Rails.logger.error("ERROR: Failed to fetch swimmer #{first_name} #{last_name}")
         SwimmerAlias.find_or_create_by(first_name: first_name, last_name: last_name)
       end
     end
 
     swimmers
+  end
+
+  def self.fetch_relay_swimmer(first_name, last_name, year)
+    begin
+      fetch_swimmers_by_name(first_name, last_name, year)[0]
+    rescue
+      Rails.logger.error("ERROR: Failed to fetch swimmer #{first_name} #{last_name}")
+      nil
+    end
+  end
+
+  def self.get_meet_relays(meet)
+    relays = []
+
+    Rails.logger.info("=== Fetching relays for meet #{meet.usms_meet_id} ===")
+
+    url = File.join(BASE_URL, '/comp/meets/meetsearch.php')
+    params = { club: 'MEMO', MeetID: meet.usms_meet_id }
+    response = RestClient.get(url, params: params)
+
+    page = Nokogiri::HTML(response)
+    text = page.css('div.contenttext pre')[1].text
+
+    age_group = nil
+    event = nil
+    name = nil
+    time_ms = nil
+    swimmer1 = nil
+    swimmer2 = nil
+    swimmer3 = nil
+
+    text.lines.each do |line|
+      if line =~ /^(Women|Men|Mixed) (\d+)\S+ (\d+) \S+ (Medley|Free)/
+        gender =
+            case $1
+            when 'Women' then 'W'
+            when 'Men' then 'M'
+            when 'Mixed' then 'X'
+            else nil
+            end
+        start_age = $2
+        age_group = AgeGroup.find_by(gender: gender, start_age: start_age.to_i, relay: true)
+        distance = $3
+        stroke = $4
+        event = Event.find_by(distance: distance, course: meet.course, stroke: stroke, relay: true)
+      elsif line =~ /^.{5}(MEMO \S+) +\S+ +(\S+)/
+        name = $1
+        time_ms = time_to_ms($2)
+      else
+        if line =~ /1\) (\D+) [MF]\d{2,}/
+          parts = parse_last_name_comma_first($1)
+          swimmer1 = fetch_relay_swimmer(parts[:first_name], parts[:last_name], meet.year)
+        end
+        if line =~ /2\) (\D+) [MF]\d{2,}/
+          parts = parse_last_name_comma_first($1)
+          swimmer2 = fetch_relay_swimmer(parts[:first_name], parts[:last_name], meet.year)
+        end
+        if line =~ /3\) (\D+) [MF]\d{2,}/
+          parts = parse_last_name_comma_first($1)
+          swimmer3 = fetch_relay_swimmer(parts[:first_name], parts[:last_name], meet.year)
+        end
+        if line =~ /4\) (\D+) [MF]\d{2,}/
+          parts = parse_last_name_comma_first($1)
+          swimmer4 = fetch_relay_swimmer(parts[:first_name], parts[:last_name], meet.year)
+          relay = Relay.find_or_initialize_by(
+            meet: meet,
+            event: event,
+            age_group: age_group,
+            name: name
+          )
+          begin
+            relay.update!(
+              time_ms: time_ms,
+              swimmer1: swimmer1,
+              swimmer2: swimmer2,
+              swimmer3: swimmer3,
+              swimmer4: swimmer4
+            )
+            relays << relay
+          rescue => e
+            Rails.logger.error("ERROR: Failed to update relay for meet #{meet.usms_meet_id} event #{event.id}: #{e}")
+          end
+        end
+      end
+    end
+
+    relays
   end
 
   def self.fetch_meets_from_year(year)
@@ -215,7 +314,7 @@ module UsmsService
 
     Meet.where(year: year).each do |meet|
       begin
-        swimmers.concat fetch_swimmers_from_meet(meet.usms_meet_id)
+        swimmers.concat fetch_swimmers_from_meet(meet)
       rescue => e
         Rails.logger.error("ERROR: Failed to fetch swimmers from meet #{meet.usms_meet_id}\n#{e.message}\n#{e.backtrace.join("\n")}")
       end
@@ -293,7 +392,7 @@ module UsmsService
               )
               results << result
             rescue => e
-              Rails.logger.error("Failed to fetch result for meet #{usms_meet_id} event #{event.id}: #{e}")
+              Rails.logger.error("ERROR: Failed to fetch result for meet #{usms_meet_id} event #{event.id}: #{e}")
             end
           end
         end
