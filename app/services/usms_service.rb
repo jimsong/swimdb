@@ -212,7 +212,7 @@ module UsmsService
     end
   end
 
-  def self.get_meet_relays(meet)
+  def self.fetch_meet_relays(meet)
     relays = []
 
     Rails.logger.info("=== Fetching relays for meet #{meet.usms_meet_id} ===")
