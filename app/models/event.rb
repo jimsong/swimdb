@@ -2,6 +2,7 @@ class Event < ApplicationRecord
   has_many :meet_events
   has_many :meets, through: :meet_events
   has_many :results
+  has_many :relays
 
   COURSES = %w(SCY SCM LCM).freeze
   STROKES = %w(Fly Back Breast Free IM).freeze

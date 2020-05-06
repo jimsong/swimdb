@@ -1,8 +1,9 @@
 namespace :swimdb do
 
   task ad_hoc: :environment do
-    meet = Meet.find(1002)
-    SwimPhoneService.fetch_meet_dates(meet)
+    Meet.where("club_assistant_meet_id IS NOT NULL AND start_date != end_date").each do |m|
+      SwimPhoneService.fetch_relay_dates(m)
+    end
   end
 
 end

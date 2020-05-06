@@ -1,5 +1,6 @@
 class AgeGroup < ApplicationRecord
   has_many :results
+  has_many :relays
 
   GENDERS = %w(M W).freeze
 
