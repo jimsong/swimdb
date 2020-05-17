@@ -269,15 +269,15 @@ module UsmsService
             meet: meet,
             event: event,
             age_group: age_group,
-            name: name
+            swimmer1: swimmer1,
+            swimmer2: swimmer2,
+            swimmer3: swimmer3,
+            swimmer4: swimmer4
           )
           begin
             relay.update!(
               time_ms: time_ms,
-              swimmer1: swimmer1,
-              swimmer2: swimmer2,
-              swimmer3: swimmer3,
-              swimmer4: swimmer4
+              name: name
             )
             relays << relay
           rescue => e
