@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   scope :commands do
     post '/swimdb', to: 'commands#swimdb'
     post '/tides', to: 'commands#tides'
+    post '/watertemp', to: 'commands#watertemp'
   end
 
 end

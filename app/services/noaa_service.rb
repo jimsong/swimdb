@@ -28,4 +28,23 @@ module NoaaService
       }
     end
   end
+
+  def self.fetch_temperature
+    date_string = TIME_ZONE.now.strftime("%Y%m%d")
+
+    params = {
+      product: 'water_temperature',
+      begin_date: date_string,
+      end_date: date_string,
+      station: STATION,
+      time_zone: 'lst_ldt',
+      units: 'english',
+      interval: 6,
+      format: 'json',
+    }
+
+    response = RestClient.get(BASE_URL, params: params)
+    parsed_response = JSON.parse(response.body)
+    parsed_response['data'].last['v'].to_f
+  end
 end

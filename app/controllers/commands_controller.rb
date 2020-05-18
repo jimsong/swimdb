@@ -16,7 +16,7 @@ class CommandsController < SlackController
     tide_data.each do |tide|
       tide_date = tide[:time].to_date
       if current_date != tide_date
-        upcoming_tides_text += "*#{tide[:time].strftime("%A, %-m/%-d")}*\n"
+        upcoming_tides_text += "\n*#{tide[:time].strftime("%A, %-m/%-d")}*\n"
         current_date = tide_date
       end
       upcoming_tides_text += "#{tide[:type] == 'H' ? 'High' : 'Low'} tide at #{tide[:time].strftime("%l:%M %p").strip}\n"
@@ -29,7 +29,7 @@ class CommandsController < SlackController
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: "Next high tide is at *#{next_high_tide[:time].strftime("%l:%M %p").strip}*"
+            text: "Next high tide is at *#{next_high_tide[:time].strftime("%l:%M %p")}*"
           }
         },
         {
@@ -39,10 +39,18 @@ class CommandsController < SlackController
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: "Upcoming tides:\n#{upcoming_tides_text}"
+            text: upcoming_tides_text.strip
           }
         }
       ]
+    }
+  end
+
+  def watertemp
+    temp = NoaaService.fetch_temperature
+    render json: {
+      response_type: 'ephemeral',
+      text: "Current water temperature in Alameda is *#{temp} °F*"
     }
   end
 
