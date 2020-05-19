@@ -33,15 +33,19 @@ class CommandsController < SlackController
           }
         },
         {
-          type: 'divider'
-        },
-        {
           type: 'section',
           text: {
             type: 'mrkdwn',
             text: upcoming_tides_text.strip
           }
-        }
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: '<https://tidesandcurrents.noaa.gov/waterlevels.html?id=9414750&timezone=LST%2FLDT|More information>'
+          }
+        },
       ]
     }
   end
@@ -50,7 +54,22 @@ class CommandsController < SlackController
     temp = NoaaService.fetch_temperature
     render json: {
       response_type: 'ephemeral',
-      text: "Current water temperature in Alameda is *#{temp} °F*"
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: "Current water temperature in Alameda is *#{temp} °F*"
+          }
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: '<https://tidesandcurrents.noaa.gov/physocean.html?id=9414750&timezone=LST%2FLDT|More information>'
+          }
+        },
+      ]
     }
   end
 
