@@ -19,7 +19,7 @@ class CommandsController < SlackController
         text += "\n*#{tide[:time].strftime("%A, %-m/%-d")}*\n"
         current_date = tide_date
       end
-      text += "#{tide[:type] == 'H' ? 'High' : 'Low'} tide at #{tide[:time].strftime("%l:%M %p").strip}\n"
+      text += "#{tide[:type] == 'H' ? 'High' : 'Low'} tide at #{tide[:time].strftime("%l:%M %p").strip} (#{tide[:height_in_ft].round(1)} ft)\n"
     end
     text += "\n<https://tidesandcurrents.noaa.gov/waterlevels.html?id=9414750&timezone=LST%2FLDT|More information>"
 
