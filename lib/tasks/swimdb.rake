@@ -11,7 +11,7 @@ namespace :swimdb do
   end
 
   task monitor_open_slots: :environment do
-    id = 3
+    id = 6
     service = SignUpGeniusService.new(id)
 
     puts 'Initializing service'
@@ -33,7 +33,7 @@ namespace :swimdb do
         puts 'Found new slots'
         puts found_slots.inspect
         message = <<~HEREDOC
-          New slots available!
+          New time#{ found_slots.count > 1 ? 's' : '' } available!
           #{found_slots.map {|slot| puts slot.inspect; "#{slot[:date]} #{slot[:time]}"}.join("\n")}
           Go <#{service.url}|here> to sign up
         HEREDOC
