@@ -1,13 +1,13 @@
 class SignUpGeniusService
-  BASE_URL = 'https://www.signupgenius.com/go/904044caaa92aa2fa7-soda'
+  BASE_URL = 'https://www.signupgenius.com/go/'
   NBSP = 160.chr(Encoding::UTF_8)
 
-  def initialize(id)
-    @id = id
+  def initialize(urlid)
+    @urlid = urlid
   end
 
   def url
-    BASE_URL + @id.to_s
+    File.join(BASE_URL, @urlid)
   end
 
   def page

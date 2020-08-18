@@ -10,9 +10,8 @@ namespace :swimdb do
     end; nil
   end
 
-  task monitor_open_slots: :environment do
-    id = 6
-    service = SignUpGeniusService.new(id)
+  task :monitor_open_slots, [:urlid] => :environment do |_, args|
+    service = SignUpGeniusService.new(args[:urlid])
 
     puts 'Initializing service'
     open_slots = Set.new(service.open_slots)
