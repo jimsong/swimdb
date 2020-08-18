@@ -33,7 +33,7 @@ namespace :swimdb do
         puts found_slots.inspect
         message = <<~HEREDOC
           New time#{ found_slots.count > 1 ? 's' : '' } available!
-          #{found_slots.map {|slot| puts slot.inspect; "#{slot[:date]} #{slot[:time]}"}.join("\n")}
+          #{found_slots.map {|slot| puts slot.inspect; "#{slot[:date]} #{slot[:time]} #{slot[:pool]}"}.join("\n")}
           Go <#{service.url}|here> to sign up
         HEREDOC
         SlackService.send_message(SlackService::POOL_NOTIFICATIONS, message)
