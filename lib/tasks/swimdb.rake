@@ -23,8 +23,9 @@ namespace :swimdb do
       begin
         new_open_slots = Set.new(service.open_slots)
       rescue => e
-        puts "Error polling SignUpGenius at #{Time.now}: #{e}"
-        filename = "log/response-#{Time.now.strftime("%Y%m%d-%H%M%S")}.html"
+        time = Time.now
+        puts "Error polling SignUpGenius at #{time}: #{e}"
+        filename = "log/response-#{time.strftime("%Y%m%d-%H%M%S")}.html"
         File.write(filename, service.response.body)
       end
 
