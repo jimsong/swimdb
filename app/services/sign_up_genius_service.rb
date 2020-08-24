@@ -18,6 +18,12 @@ class SignUpGeniusService
   end
 
   def open_slots
+    table = page.css('table.SUGtableouter').first
+    if table.nil?
+      filename = "log/response-#{Time.now.strftime("%Y%m%d-%H%M%S")}.html"
+      File.write(filename, @response.body)
+      raise 'No table found'
+    end
     inputs = page.css('input').select {|input| input['name'] == 'siid'}
     inputs.map { |input| slot_info_from_input(input) }
   end
