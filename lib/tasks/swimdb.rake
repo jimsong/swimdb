@@ -33,11 +33,18 @@ namespace :swimdb do
         log_slots(new_open_slots)
       end
 
-      found_slots = new_open_slots - open_slots
-      open_slots = new_open_slots
-      if found_slots.count > 0
-        puts "Found new slots at #{Time.now}"
-        send_message(service, found_slots)
+      if new_open_slots.empty?
+        time = Time.now
+        puts "Error: got an empty response with status #{service.response.code} at #{time}"
+        filename = "log/response-#{time.strftime("%Y%m%d-%H%M%S")}.html"
+        File.write(filename, service.response.body)
+      else
+        found_slots = new_open_slots - open_slots
+        open_slots = new_open_slots
+        if found_slots.count > 0
+          puts "Found new slots at #{Time.now}"
+          send_message(service, found_slots)
+        end
       end
 
       sleep 60

@@ -14,7 +14,7 @@ class SignUpGeniusService
 
   def page
     @response = RestClient.get(url)
-    Nokogiri::HTML(@response)
+    Nokogiri::HTML(@response.body)
   end
 
   def open_slots
@@ -22,7 +22,7 @@ class SignUpGeniusService
     if table.nil?
       raise 'No table found'
     end
-    inputs = page.css('input').select {|input| input['name'] == 'siid'}
+    inputs = table.css('input').select {|input| input['name'] == 'siid'}
     inputs.map { |input| slot_info_from_input(input) }
   end
 
