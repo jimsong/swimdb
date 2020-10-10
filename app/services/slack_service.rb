@@ -2,7 +2,8 @@ class SlackService
   BASE_URL = 'https://slack.com/api/chat.postMessage'
   JIMMY_TEST = 'CS1SBMSRL'
   POOL_SWIMMING = 'C0172JTL98S'
-  POOL_NOTIFICATIONS = 'C017LAXUV7G'
+  NOTIFICATIONS_ENCINAL = 'C01C8RD21T7'
+  NOTIFICATIONS_SODA = 'C017LAXUV7G'
 
   def self.access_token
     Rails.application.credentials.slack[:bot_access_token]

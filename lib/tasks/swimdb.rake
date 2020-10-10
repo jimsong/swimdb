@@ -10,8 +10,9 @@ namespace :swimdb do
     end; nil
   end
 
-  task :monitor_open_slots, [:urlid] => :environment do |_, args|
+  task :monitor_open_slots, [:urlid, :channel_id] => :environment do |_, args|
     service = SignUpGeniusService.new(args[:urlid])
+    channel_id = args[:channel_id]
 
     puts 'Initializing service'
     open_slots = Set.new(service.open_slots)
@@ -25,8 +26,8 @@ namespace :swimdb do
       rescue => e
         time = Time.now
         puts "Error polling SignUpGenius at #{time}: #{e}"
-        filename = "log/response-#{time.strftime("%Y%m%d-%H%M%S")}.html"
-        File.write(filename, service.response.body)
+        # filename = "log/response-#{time.strftime("%Y%m%d-%H%M%S")}.html"
+        # File.write(filename, service.response.body)
       end
 
       if open_slots != new_open_slots
@@ -37,7 +38,7 @@ namespace :swimdb do
       open_slots = new_open_slots
       if found_slots.count > 0
         puts "Found new slots at #{Time.now}"
-        send_message(service, found_slots)
+        send_message(service, channel_id, found_slots)
       end
 
       sleep 60
@@ -50,13 +51,13 @@ namespace :swimdb do
     File.write(filename, content)
   end
 
-  def send_message(service, open_slots)
+  def send_message(service, channel_id, open_slots)
     message = <<~HEREDOC
       New slot#{ open_slots.count > 1 ? 's' : '' } available!
       #{open_slots.map {|slot| "#{slot[:date]} #{slot[:time]} #{slot[:pool]}"}.join("\n")}
       Go <#{service.url}|here> to sign up
     HEREDOC
-    SlackService.send_message(SlackService::POOL_NOTIFICATIONS, message)
+    SlackService.send_message(channel_id, message)
   end
 
 end
