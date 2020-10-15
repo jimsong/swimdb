@@ -46,14 +46,14 @@ namespace :swimdb do
   end
 
   def log_slots(slots)
-    filename = "log/slots-#{Time.now.strftime("%Y%m%d-%H%M%S")}.json"
-    content = JSON.pretty_generate(slots.to_a)
-    File.write(filename, content)
+    # filename = "log/slots-#{Time.now.strftime("%Y%m%d-%H%M%S")}.json"
+    # content = JSON.pretty_generate(slots.to_a)
+    # File.write(filename, content)
   end
 
   def send_message(service, channel_id, open_slots)
     message = <<~HEREDOC
-      New slot#{ open_slots.count > 1 ? 's' : '' } available!
+      <!channel> New slot#{ open_slots.count > 1 ? 's' : '' } available!
       #{open_slots.map {|slot| "#{slot[:date]} #{slot[:time]} #{slot[:pool]}"}.join("\n")}
       Go <#{service.url}|here> to sign up
     HEREDOC
