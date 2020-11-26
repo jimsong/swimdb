@@ -381,7 +381,7 @@ module UsmsService
             event_name = tds[4].text.gsub(NBSP, ' ').strip
             event = Event.find_by_course_and_name(course, event_name)
             time_text = tds[6].text.gsub(NBSP, ' ').strip
-            time_text =~ /((\d*):)?(\d+)\.(\d+)/
+            next if %w[DQ DNF EXH].include?(time_text)
             time_ms = time_to_ms(time_text)
             age_group = AgeGroup.find_by!(gender: swimmer.gender, start_age: start_age)
             result = swimmer.results.find_or_initialize_by(meet: meet, event: event, age_group: age_group)
