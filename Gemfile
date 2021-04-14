@@ -6,7 +6,7 @@ ruby '2.7.0'
 gem 'mysql2', '~> 0.5.3'
 gem 'puma', '~> 4.3'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.0', '>= 6.0.3.4'
+gem 'rails', '~> 6.0', '>= 6.0.3.5'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
