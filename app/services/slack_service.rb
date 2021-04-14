@@ -4,6 +4,7 @@ class SlackService
   POOL_SWIMMING = 'C0172JTL98S'
   NOTIFICATIONS_ENCINAL = 'C01C8RD21T7'
   NOTIFICATIONS_SODA = 'C017LAXUV7G'
+  JIMMY_USER = 'U71HFL56C'
 
   def self.access_token
     Rails.application.credentials.slack[:bot_access_token]

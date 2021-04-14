@@ -57,7 +57,11 @@ namespace :swimdb do
       #{open_slots.map {|slot| "#{slot[:date]} #{slot[:time]} #{slot[:pool]}"}.join("\n")}
       Go <#{service.url}|here> to sign up
     HEREDOC
-    SlackService.send_message(channel_id, message)
+    Thread.new do
+      SlackService.send_message(SlackService::JIMMY_USER, message)
+      sleep 60
+      SlackService.send_message(channel_id, message)
+    end
   end
 
 end
